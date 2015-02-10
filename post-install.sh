@@ -690,8 +690,6 @@ then
 	###################
 
 	lang=${LANG%_*}
-	text="Installation terminée, merci d'avoir utilisé ce script"
-	(mplayer "http://translate.google.com/translate_tts?ie=UTF-8&tl=${lang}&q=${text}" &> /dev/null &)
 	if [ "$bPostInstFailed" = "1" ]; then
 		/usr/bin/zenity --error --text="Installation terminée, ERREUR détectée!"
 	else
