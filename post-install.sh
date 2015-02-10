@@ -30,9 +30,9 @@
 #based on the idea of: http://czytelnia.ubuntu.pl/index.php/2009/11/03/skrypt-ulatwiajacy-konfiguracje-ubuntu-9-10-karmic-koala/, but Ubuntu Start is a completely re-written script with lots of new features.
 
 
-MIRROR_ADDR="http://192.168.1.2/"
+MIRROR_ADDR="http://192.170.1.1/"
 # Download manual ## TODO: take latest version + download from the local mirror
-MANUAL_FR="https://ubuntu-manual.org//download/13.10/fr/screen"
+MANUAL_FR="https://ubuntu-manual.org/download/14.04/fr/screen"
 # WEBPAGE_END="http://www.louvainlinux.be/statistiques-install-party-q2/"
 TRUETYPEPATH="/usr/share/fonts/truetype/"
 ROOT_UID=0
@@ -287,7 +287,34 @@ test "$MIRROR_GOOD_DISTRIB" = "TRUE" && PPAS=FALSE || PPAS=TRUE
 choicess=`/usr/bin/zenity --title="$WORD8" --width=600 --height=600 \
 				--text="$WORD9" \
 				--list --column="$WORD10" --column="$WORD11" \
-				--checklist FALSE "$WORD12" FALSE "$WORD13" FALSE "$WORD16" FALSE "$WORD17" TRUE "$WORD20" FALSE "$WORD21" FALSE "$WORD26" FALSE "$WORD27" $PPAS "$WORD34" $MIRROR_GOOD_DISTRIB "$WORD39" FALSE "$WORD40" TRUE "$WORD41" FALSE "$WORD42" TRUE "$WORD44" FALSE "$WORD45" TRUE "$WORD46" FALSE "$WORD47" TRUE "$WORD48" TRUE "$WORD49" FALSE "$WORD50" FALSE "$WORD51" TRUE "$WORD52" FALSE "$WORD53" TRUE "$WORD54" FALSE "$WORD55" TRUE "$WORD56" FALSE "$WORD57"`
+				--checklist \
+				FALSE "$WORD12" \
+				FALSE "$WORD13" \
+				FALSE "$WORD16" \
+				FALSE "$WORD17" \
+				TRUE "$WORD20" \
+				FALSE "$WORD21" \
+				FALSE "$WORD26" \
+				FALSE "$WORD27" \
+				$PPAS "$WORD34" \
+				$MIRROR_GOOD_DISTRIB "$WORD39" \
+				FALSE "$WORD40" \
+				TRUE "$WORD41" \
+				FALSE "$WORD42" \
+				TRUE "$WORD44" \
+				FALSE "$WORD45" \
+				TRUE "$WORD46" \
+				FALSE "$WORD47" \
+				TRUE "$WORD48" \
+				TRUE "$WORD49" \
+				FALSE "$WORD50" \
+				FALSE "$WORD51" \
+				TRUE "$WORD52" \
+				FALSE "$WORD53" \
+				TRUE "$WORD54" \
+				FALSE "$WORD55" \
+				TRUE "$WORD56" \
+				FALSE "$WORD57"`
 
 if [ $? -eq 0 ];
 then
@@ -444,7 +471,48 @@ test `grep "MemTotal:" /proc/meminfo | awk '{print $2}'` -le 4000000 && ZRAM=TRU
 test `lspci | grep VGA | grep -ci nvidia` -ge 1 -a `lspci -vnn | grep -c '\''[030[02]\]'` -ge 2 && NVIDIA_PRIME=TRUE || NVIDIA_PRIME=FALSE
 
 #gui 2
-choices=`/usr/bin/zenity --title="Etape 2: installation des paquets" --width=800 --height=600 --text="Choisissez les paquets à installer:" --list --column="Sélectionné" --column="Paquet" --column="Description" --checklist TRUE "Cairo-Dock" "Un environnement et une barre des tâches (dock) sympa et pratique" FALSE "Cairo-Dock Weekly" "Un environnement et une barre des tâches sympa et pratique (Weekly version)" FALSE "Chromium Browser" "Navigateur open source avec Pepper (flash)" FALSE "Thèmes supplémentaires" "Installation des thèmes de community" FALSE "Evolution" "Client E-mail" FALSE "Dropbox" "Application qui synchronise un dossier avec des serveurs sur le cloud (Gratuit, 2Go)" FALSE "Google Earth" "Google Earth vous permet de voyager partout sur Terre" FALSE "Outils de développement" "De build-essential à Subversion, GIT et autres" FALSE "Outils de packaging Debian-Ubuntu" "Pour la construction de paquets et développement pour Debian et Ubuntu" FALSE "Pidgin" "Client de messageries instantanées" TRUE "Inkscape" "Editeur d'images vectorielles" TRUE "Gimp" "Editeur complet d'images bitmap" FALSE "LaTeX" "LaTeX (binaires, modules et éditeur)" FALSE "Eclipse" "L'éditeur pour développeur par IBM" TRUE "Misc" "Quelques utilitaires (convertir du texte, de la musique, renommer plusieurs fichiers, etc.)" TRUE "Environnement de bureau Gnome" "Gnome-Shell et le Gnome-Panel" FALSE "Wine" "Lancer des applications Windows sous Linux" TRUE "VLC" "Lecteur de vidéos" TRUE "Codecs et extras" "Codecs (multimedia, java, flash), support d'archives supplémentaires, support DVD et fonts" TRUE "Ubuntu-Tweak" "Outil d'amélioration d'Ubuntu et plein de dépôts additionnels (PPAs) (Attention, beta)" TRUE "Unity-Tweak-Tool" "Outil simple de personnalisation" TRUE "CCSM et extra plugins" "CompizConfig Settings Manager et extra plugins" FALSE "Skype" "Application VoIP chat" TRUE "OpenShot" "Éditeur de vidéo simple et puissant" FALSE "Audacity" "Éditeur audio simple et puissant" FALSE "Blender" "Logiciel complet et puissant de création de vidéos animée" TRUE "Google Talk plugin" "Plugin Google Talk pour le navigateur (audio et vidéo chat dans GMail et Google Plus)" FALSE "GThumb" "Visionneur d'image rapide avec plusieurs options intéressantes" FALSE "EasyTag" "Éditeur performant de tags pour les fichiers audio" FALSE "Gobby" "Editeur de texte collaboratif (édition à plusieurs en même temps)" FALSE "Hugin" "Créateur de panorama à partir de plusieurs photos" FALSE "FileZilla" "Client FTP réputé" TRUE "Synapse" "Recherche rapide d'un peu de tout" FALSE "EasyStroke" "Contrôle du bureau avec des mouvements de souris" $ZRAM "ZRam" "Utiliser ZRam (compression de la mémoire ram peu utilisée): très conseillé pour les PCs avec 2 voir 4 Go de Ram et moins)" FALSE "Steam" "Installer Steam (jeux vidéos propriétaires)" $NVIDIA_PRIME "nVidia Prime" "nVidia Optimus technology (ex Optimus) - Uniquement si nécessaire" FALSE "Pipelight" "Installe et active les plugins propriétaires Silverlight, Unity3D et Widevine pour Firefox" FALSE "Atom" "Éditeur de texte du style de Sublime Text mais libre, plus personnalisable et éditer par Github"`
+choices=`/usr/bin/zenity --title="Etape 2: installation des paquets" --width=800 --height=600 \
+	--text="Choisissez les paquets à installer:" --list --column="Sélectionné" --column="Paquet" --column="Description" \
+	--checklist \
+	FALSE "Audacity" "Éditeur audio simple et puissant" \
+	FALSE "Atom" "Éditeur de texte du style de Sublime Text mais libre, plus personnalisable et édité par Github" \
+	FALSE "Blender" "Logiciel complet et puissant de création de vidéos animée" \
+	FALSE "Cairo-Dock" "Un environnement et une barre des tâches (dock) sympa et pratique" \
+	FALSE "Cairo-Dock Weekly" "Un environnement et une barre des tâches sympa et pratique (Weekly version)" \
+	TRUE "CCSM et extra plugins" "CompizConfig Settings Manager et extra plugins" \
+	FALSE "Chromium Browser" "Navigateur open source avec Pepper (flash)" \
+	TRUE "Codecs et extras" "Codecs (multimedia, java, flash), support d'archives supplémentaires, support DVD et fonts" \
+	FALSE "Dropbox" "Application qui synchronise un dossier avec des serveurs sur le cloud (Gratuit, 2Go)" \
+	FALSE "EasyStroke" "Contrôle du bureau avec des mouvements de souris" \
+	FALSE "EasyTag" "Éditeur performant de tags pour les fichiers audio" \
+	FALSE "Evolution" "Client E-mail" \
+	FALSE "Eclipse" "Un IDE, principalement pour Java" \
+	FALSE "Environnement de bureau Gnome" "Gnome-Shell et le Gnome-Panel" \
+	FALSE "FileZilla" "Client FTP réputé" \
+	TRUE "Gimp" "Editeur complet d'images bitmap" \
+	FALSE "Gobby" "Editeur de texte collaboratif (édition à plusieurs en même temps)" \
+	FALSE "Google Earth" "Google Earth vous permet de voyager partout sur Terre" \
+	FALSE "Google Talk plugin" "Plugin Google Talk pour le navigateur (audio et vidéo chat dans GMail et Google Plus)" \
+	FALSE "GThumb" "Visionneur d'image rapide avec plusieurs options intéressantes" \
+	FALSE "Hugin" "Créateur de panorama à partir de plusieurs photos" \
+	TRUE "Inkscape" "Editeur d'images vectorielles" \
+	FALSE "LaTeX" "LaTeX (binaires, modules et éditeur)" \
+	TRUE "Misc" "Quelques utilitaires (convertir du texte, de la musique, renommer plusieurs fichiers, etc.)" \
+	$NVIDIA_PRIME "nVidia Prime" "nVidia Optimus technology (ex Optimus) - Uniquement si nécessaire" \
+	TRUE "OpenShot" "Éditeur de vidéo simple et puissant" \
+	FALSE "Outils de développement" "De build-essential à Subversion, GIT et autres" \
+	FALSE "Outils de packaging Debian-Ubuntu" "Pour la construction de paquets et développement pour Debian et Ubuntu" \
+	FALSE "Pidgin" "Client de messageries instantanées" \
+	FALSE "Pipelight" "Installe et active les plugins propriétaires Silverlight, Unity3D et Widevine pour Firefox" \
+	FALSE "Skype" "Application VoIP chat" \
+	FALSE "Steam" "Installer Steam (jeux vidéos propriétaires)" \
+	TRUE "Synapse" "Recherche rapide d'un peu de tout" \
+	FALSE "Thèmes supplémentaires" "Installation des thèmes de community" \
+	TRUE "Ubuntu-Tweak" "Outil d'amélioration d'Ubuntu et plein de dépôts additionnels (PPAs) (Attention, beta)" \
+	TRUE "Unity-Tweak-Tool" "Outil simple de personnalisation" \
+	TRUE "VLC" "Lecteur de vidéos" \
+	FALSE "Wine" "Lancer des applications Windows sous Linux" \
+	$ZRAM "ZRam" "Utiliser ZRam (compression de la mémoire ram peu utilisée): très conseillé pour les PCs avec 2 voir 4 Go de Ram et moins)"`
 
 packagesInst=""
 if [ $? -eq 0 ]
