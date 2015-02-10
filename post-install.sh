@@ -283,7 +283,7 @@ choicess=`/usr/bin/zenity --title="$WORD8" --width=600 --height=600 \
 				FALSE "$WORD45" \
 				FALSE "$WORD46" \
 				FALSE "$WORD47" \
-				TRUE "$WORD48" \
+				FALSE "$WORD48" \
 				TRUE "$WORD49" \
 				FALSE "$WORD50" \
 				FALSE "$WORD51" \
