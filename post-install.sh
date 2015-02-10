@@ -45,27 +45,13 @@ DIR=$(pwd)
 if [ "$UID" -ne "$ROOT_UID" ];
 	then
 	echo ""
-	echo "Vous devez lancer ce script avec les droits de l'administrateur."
-	echo ""
-	echo "Tentative de relancement."
 	echo "Merci d'entrer votre mot de passe ci-dessous (les caractères tapés seront invisibles, il n'y aura pas d'astérisque pour des raisons de sécurité)"
 	echo ""
-	sudo "./`basename $0`"
+	sudo DBUS_SESSION_BUS_ADDRESS=$DBUS_SESSION_BUS_ADDRESS "./`basename $0`"
 	exit
 fi
 
 ON_USER=$(users | awk '{print $1}') # first: the one who has launched X
-
-#running gconf-tool2/dconf with "sudo" fails to set the options for the current user so this tweak makes it possible to run sudo for gconf-tool2 and change the setting for the current user, not the root user
-# export $(grep -v "^#" /home/$ON_USER/.dbus/session-bus/`cat /var/lib/dbus/machine-id`-0)
-# sudo -u $ON_USER test -z "$DBUS_SESSION_BUS_ADDRESS" && eval `sudo -u $ON_USER dbus-launch --sh-syntax --exit-with-session`
-
-#Note: Ubuntu 14.04 Trusty: it's no longer possible to launch gsettings/gconftool with that... #TODO: find a better fix...
-CMD_FOR_USER="$DIR/$ON_USER.sh"
-echo '#!/bin/bash
-[ "$UID" -eq "0" ] && echo "Ne pas lancer avec ROOT" && exit 1' > "$CMD_FOR_USER"
-chmod +x "$CMD_FOR_USER"
-chown $ON_USER:$ON_USER "$CMD_FOR_USER"
 
 DISTRIB=$(grep -e DISTRIB_CODENAME /etc/lsb-release | cut -d= -f2)
 DISTRIBNUM=$(grep -e DISTRIB_RELEASE= /etc/lsb-release | cut -d= -f2 | cut -d. -f1)
@@ -301,26 +287,26 @@ then
 	do
 		if [ "$choicee" = "$WORD12" ]; # WM: button: layout
 			then
-			echo 'gconftool-2 --type string --set /apps/metacity/general/button_layout "menu:minimize,maximize,close"' >> "$CMD_FOR_USER"
-			echo 'gsettings set org.gnome.desktop.wm.preferences "menu:minimize,maximize,close"' >> "$CMD_FOR_USER"
+			sudo DBUS_SESSION_BUS_ADDRESS=$DBUS_SESSION_BUS_ADDRESS -u $ON_USER gconftool-2 --type string --set /apps/metacity/general/button_layout "menu:minimize,maximize,close"
+			sudo DBUS_SESSION_BUS_ADDRESS=$DBUS_SESSION_BUS_ADDRESS -u $ON_USER gsettings set org.gnome.desktop.wm.preferences "menu:minimize,maximize,close"
 		elif [ "$choicee" = "$WORD13" ];
 			then
-			echo 'gconftool-2 --type string --set /apps/metacity/general/button_layout "close,minimize,maximize:"' >> "$CMD_FOR_USER"
-			echo 'gsettings set org.gnome.desktop.wm.preferences "close,minimize,maximize:"' >> "$CMD_FOR_USER"
+			sudo DBUS_SESSION_BUS_ADDRESS=$DBUS_SESSION_BUS_ADDRESS -u $ON_USER gconftool-2 --type string --set /apps/metacity/general/button_layout "close,minimize,maximize:"
+			sudo DBUS_SESSION_BUS_ADDRESS=$DBUS_SESSION_BUS_ADDRESS -u $ON_USER gsettings set org.gnome.desktop.wm.preferences "close,minimize,maximize:"
 		elif [ "$choicee" = "$WORD16" ]; # volumes: icons in desktop
 			then
-			echo 'gsettings set org.gnome.nautilus.desktop volumes-visible false' >> "$CMD_FOR_USER"
+			sudo DBUS_SESSION_BUS_ADDRESS=$DBUS_SESSION_BUS_ADDRESS -u $ON_USER gsettings set org.gnome.nautilus.desktop volumes-visible false
 		elif [ "$choicee" = "$WORD17" ];
 			then
-			echo 'gsettings set org.gnome.nautilus.desktop volumes-visible true' >> "$CMD_FOR_USER"
+			sudo DBUS_SESSION_BUS_ADDRESS=$DBUS_SESSION_BUS_ADDRESS -u $ON_USER gsettings set org.gnome.nautilus.desktop volumes-visible true
 		elif [ "$choicee" = "$WORD20" ]; # buttons/menus have icons
 			then
-			echo 'gsettings set org.gnome.desktop.interface buttons-have-icons true' >> "$CMD_FOR_USER"
-			echo 'gsettings set org.gnome.desktop.interface menus-have-icons true' >> "$CMD_FOR_USER"
+			sudo DBUS_SESSION_BUS_ADDRESS=$DBUS_SESSION_BUS_ADDRESS -u $ON_USER gsettings set org.gnome.desktop.interface buttons-have-icons true
+			sudo DBUS_SESSION_BUS_ADDRESS=$DBUS_SESSION_BUS_ADDRESS -u $ON_USER gsettings set org.gnome.desktop.interface menus-have-icons true
 		elif [ "$choicee" = "$WORD21" ];
 			then
-			echo 'gsettings set org.gnome.desktop.interface buttons-have-icons false' >> "$CMD_FOR_USER"
-			echo 'gsettings set org.gnome.desktop.interface menus-have-icons false' >> "$CMD_FOR_USER"
+			sudo DBUS_SESSION_BUS_ADDRESS=$DBUS_SESSION_BUS_ADDRESS -u $ON_USER gsettings set org.gnome.desktop.interface buttons-have-icons false
+			sudo DBUS_SESSION_BUS_ADDRESS=$DBUS_SESSION_BUS_ADDRESS -u $ON_USER gsettings set org.gnome.desktop.interface menus-have-icons false
 		elif [ "$choicee" = "$WORD26" ]; # docs
 			then
 			sudo apt-get purge -y --force-yes ubuntu-docs
@@ -361,30 +347,30 @@ then
 			cd $DIR
 		elif [ "$choicee" = "$WORD41" ]; # terminal: scrollback unlimited
 			then # gnome-terminal is still using GConf
-			echo 'gconftool-2 -s /apps/gnome-terminal/profiles/Default/scrollback_unlimited --type bool true' >> "$CMD_FOR_USER"
+			sudo DBUS_SESSION_BUS_ADDRESS=$DBUS_SESSION_BUS_ADDRESS -u $ON_USER gconftool-2 -s /apps/gnome-terminal/profiles/Default/scrollback_unlimited --type bool true
 		elif [ "$choicee" = "$WORD42" ];
 			then
-			echo 'gconftool-2 -s /apps/gnome-terminal/profiles/Default/scrollback_unlimited --type bool false' >> "$CMD_FOR_USER"
+			sudo DBUS_SESSION_BUS_ADDRESS=$DBUS_SESSION_BUS_ADDRESS -u $ON_USER gconftool-2 -s /apps/gnome-terminal/profiles/Default/scrollback_unlimited --type bool false
 		elif [ "$choicee" = "$WORD44" ]; # scroll with two fingers
 			then
-			echo 'gsettings set org.gnome.settings-daemon.peripherals.touchpad scroll-method two-finger-scrolling' >> "$CMD_FOR_USER"
-			echo 'gsettings set org.gnome.settings-daemon.peripherals.touchpad horiz-scroll-enabled true' >> "$CMD_FOR_USER"
+			sudo DBUS_SESSION_BUS_ADDRESS=$DBUS_SESSION_BUS_ADDRESS -u $ON_USER gsettings set org.gnome.settings-daemon.peripherals.touchpad scroll-method two-finger-scrolling
+			sudo DBUS_SESSION_BUS_ADDRESS=$DBUS_SESSION_BUS_ADDRESS -u $ON_USER gsettings set org.gnome.settings-daemon.peripherals.touchpad horiz-scroll-enabled true
 		elif [ "$choicee" = "$WORD45" ];
 			then
-			echo 'gsettings set org.gnome.settings-daemon.peripherals.touchpad scroll-method edge-scrolling' >> "$CMD_FOR_USER"
-			echo 'gsettings set org.gnome.settings-daemon.peripherals.touchpad horiz-scroll-enabled false' >> "$CMD_FOR_USER"
+			sudo DBUS_SESSION_BUS_ADDRESS=$DBUS_SESSION_BUS_ADDRESS -u $ON_USER gsettings set org.gnome.settings-daemon.peripherals.touchpad scroll-method edge-scrolling
+			sudo DBUS_SESSION_BUS_ADDRESS=$DBUS_SESSION_BUS_ADDRESS -u $ON_USER gsettings set org.gnome.settings-daemon.peripherals.touchpad horiz-scroll-enabled false
 		elif [ "$choicee" = "$WORD46" ]; # disable shopping
 			then
-			echo "gsettings set com.canonical.Unity.Lenses disabled-scopes \"['more_suggestions-amazon.scope', 'more_suggestions-u1ms.scope', 'more_suggestions-populartracks.scope', 'music-musicstore.scope', 'more_suggestions-ebay.scope', 'more_suggestions-ubuntushop.scope', 'more_suggestions-skimlinks.scope']\"" >> "$CMD_FOR_USER"
+			sudo DBUS_SESSION_BUS_ADDRESS=$DBUS_SESSION_BUS_ADDRESS -u $ON_USER gsettings set com.canonical.Unity.Lenses disabled-scopes "['more_suggestions-amazon.scope', 'more_suggestions-u1ms.scope', 'more_suggestions-populartracks.scope', 'music-musicstore.scope', 'more_suggestions-ebay.scope', 'more_suggestions-ubuntushop.scope', 'more_suggestions-skimlinks.scope']"
 		elif [ "$choicee" = "$WORD47" ];
 			then
-			echo 'gsettings set com.canonical.Unity.Lenses disabled-scopes "[]"' >> "$CMD_FOR_USER"
+			sudo DBUS_SESSION_BUS_ADDRESS=$DBUS_SESSION_BUS_ADDRESS -u $ON_USER gsettings set com.canonical.Unity.Lenses disabled-scopes "[]"
 		elif [ "$choicee" = "$WORD48" ];
 			then
-			echo 'gsettings set org.compiz.core:/org/compiz/profiles/Default/plugins/core/ hsize 2' >> "$CMD_FOR_USER"
-			echo 'gsettings set org.compiz.core:/org/compiz/profiles/Default/plugins/core/ vsize 2' >> "$CMD_FOR_USER"
-			echo 'gsettings set org.compiz.core:/org/compiz/profiles/unity/plugins/core/ hsize 2' >> "$CMD_FOR_USER"
-			echo 'gsettings set org.compiz.core:/org/compiz/profiles/unity/plugins/core/ vsize 2' >> "$CMD_FOR_USER"
+			sudo DBUS_SESSION_BUS_ADDRESS=$DBUS_SESSION_BUS_ADDRESS -u $ON_USER gsettings set org.compiz.core:/org/compiz/profiles/Default/plugins/core/ hsize 2
+			sudo DBUS_SESSION_BUS_ADDRESS=$DBUS_SESSION_BUS_ADDRESS -u $ON_USER gsettings set org.compiz.core:/org/compiz/profiles/Default/plugins/core/ vsize 2
+			sudo DBUS_SESSION_BUS_ADDRESS=$DBUS_SESSION_BUS_ADDRESS -u $ON_USER gsettings set org.compiz.core:/org/compiz/profiles/unity/plugins/core/ hsize 2
+			sudo DBUS_SESSION_BUS_ADDRESS=$DBUS_SESSION_BUS_ADDRESS -u $ON_USER gsettings set org.compiz.core:/org/compiz/profiles/unity/plugins/core/ vsize 2
 		elif [ "$choicee" = "$WORD49" ];
 			then
 			XDG_DESKTOP_DIR=`grep XDG_DESKTOP_DIR /home/$ON_USER/.config/user-dirs.dirs | cut -d/ -f2 | cut -d\" -f1`
@@ -401,10 +387,10 @@ then
 			rm -f /etc/lightdm/lightdm.conf.d/50-llnux-disable-guest.conf
 		elif [ "$choicee" = "$WORD52" ];
 			then
-			echo 'gsettings set org.gnome.nautilus.preferences executable-text-activation ask' >> "$CMD_FOR_USER"
+			sudo DBUS_SESSION_BUS_ADDRESS=$DBUS_SESSION_BUS_ADDRESS -u $ON_USER gsettings set org.gnome.nautilus.preferences executable-text-activation ask
 		elif [ "$choicee" = "$WORD53" ];
 			then
-			echo 'gsettings set org.gnome.nautilus.preferences executable-text-activation display' >> "$CMD_FOR_USER"
+			sudo DBUS_SESSION_BUS_ADDRESS=$DBUS_SESSION_BUS_ADDRESS -u $ON_USER gsettings set org.gnome.nautilus.preferences executable-text-activation display
 		elif [ "$choicee" = "$WORD54" ];
 			then
 			echo 'Dpkg::Progress-Fancy "1";' > /etc/apt/apt.conf.d/99progressbar
@@ -421,23 +407,7 @@ then
 			source /home/$ON_USER/.bashrc
 		fi
 	done
-	# sudo -u $ON_USER "DBUS_SESSION_BUS_ADDRESS="$DBUS_SESSION_BUS_ADDRESS gsettings-data-convert
 	IFS=""
-	if test `wc "$CMD_FOR_USER" | awk '{print $1}'` -gt 2; then ## TODO: remove this workaround if we find something better to really execute gsettings/gconftool with user's DBus session.
-		# It seems we can't execute these command from the root user (even with sudo -u $ON_USER)
-		# If we set the right DBUS_SESSION_BUS_ADDRESS and we launch it with the right user
-		#  or if we launch all commands with: sudo -u $ON_USER $COLORTERM -x "$CMD_FOR_USER"
-		#  settings are not "saved". We can see the new settings with dconf-editor but they are not used by all applications!
-		rm -f $CMD_FOR_USER.launched
-		echo "date -R > \"$CMD_FOR_USER.launched\"" >> "$CMD_FOR_USER"
-		MSG_FOR_USER="Merci de lancer le script suivant depuis un nouveau terminal de l'utilisateur $ON_USER :\n\t$CMD_FOR_USER"
-		echo -e "\n$MSG_FOR_USER\n"
-		zenity --info --text="$MSG_FOR_USER" --title="Étape manuelle" &
-		ZENITY_PID=$!
-		echo -e "\n\tAttente de l'exécution du script: le script continuera une fois que ce script sera exécuté"
-		while test ! -f $CMD_FOR_USER.launched; do sleep 1; done
-		kill -15 $ZENITY_PID 2> /dev/null
-	fi
 	echo "Fait! L'étape 2 va commencer!"
 else
 	echo cancel selected
