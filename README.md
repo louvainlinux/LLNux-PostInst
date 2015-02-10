@@ -1,4 +1,4 @@
-LLNux PostInstall
+Louvain-li-Nux post-install script
 ===================================
 
 An Ubuntu (and derivatives such as Ubuntu Gnome, Xubuntu and Linux Mint) post-installation script launched just after an fresh installation by Louvain-li-Nux users
