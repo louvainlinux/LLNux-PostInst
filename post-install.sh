@@ -30,8 +30,9 @@
 #based on the idea of: http://czytelnia.ubuntu.pl/index.php/2009/11/03/skrypt-ulatwiajacy-konfiguracje-ubuntu-9-10-karmic-koala/, but Ubuntu Start is a completely re-written script with lots of new features.
 
 
-MIRROR_ADDR="http://192.170.1.1/"
-# Download manual ## TODO: take latest version + download from the local mirror
+PROXY_ADDR="http://192.170.1.1/"
+PROXY_PORT="3142"
+# Download manual ## TODO: download from the local mirror
 MANUAL_FR="https://ubuntu-manual.org/download/14.04/fr/screen"
 # WEBPAGE_END="http://www.louvainlinux.be/statistiques-install-party-q2/"
 TRUETYPEPATH="/usr/share/fonts/truetype/"
@@ -69,14 +70,16 @@ DISTRIB=$(grep -e DISTRIB_CODENAME /etc/lsb-release | cut -d= -f2)
 DISTRIBNUM=$(grep -e DISTRIB_RELEASE= /etc/lsb-release | cut -d= -f2 | cut -d. -f1)
 DISTRIBNUM2=$(grep -e DISTRIB_RELEASE= /etc/lsb-release | cut -d= -f2 | cut -d. -f2)
 
-# warning ##################### MIRROR
+# Test proxy
+`wget -q --no-check-certificate --timeout=5 --tries=2 $PROXY_ADDR:$PROXY_PORT -O /dev/null > /dev/null 2>&1` && USE_PROXY=TRUE || USE_PROXY=FALSE
+
+# Test distrib
 if test "$DISTRIB" = "trusty"; then
-	echo "Check mirror addr ($MIRROR_ADDR)"
-	`wget -q --no-check-certificate --timeout=5 --tries=2 $MIRROR_ADDR -O /dev/null > /dev/null 2>&1` && MIRROR_GOOD_DISTRIB=TRUE || MIRROR_GOOD_DISTRIB=FALSE
+	GOOD_DISTRIB=TRUE
 else
 	echo "WARNING: This script has been made for Ubuntu Trusty 14.04! "
 	/usr/bin/zenity --warning --title="WARNING" --text="You are not using Ubuntu 14.04 Trusty Thar"
-	MIRROR_GOOD_DISTRIB=FALSE
+	GOOD_DISTRIB=FALSE
 fi
 
 #check if the user is running 32 or 64bit
@@ -205,14 +208,6 @@ function AddMeApt ()
 {
 	myRepoComm=$1
 	myRepo=`echo ${myRepoComm:0:$(expr index "$myRepoComm" \#)-2}`
-	if [ "$MIRROR" = "yes" ]; then
-		SRC_FILE="$DIR/sources_out.list"
-		grep "^$myRepo" "$SRC_FILE" > /dev/null
-		if [ $? -eq 1 ]; then
-			# to not duplicate the repository
-			echo "$myRepoComm" | sudo tee -a "$SRC_FILE"
-		fi
-	fi
 	SRC_FILE="/etc/apt/sources.list"
 	grep "^$myRepo" $SRC_FILE > /dev/null
 	if [ $? -eq 1 ]; then
@@ -221,30 +216,12 @@ function AddMeApt ()
 	fi
 }
 
-function OurMirror ()
+function OurProxy ()
 {
 	if [ "$1" = "up" ]; then
-		if test -f "$DIR/keys.gpg"; then
-			sudo apt-key adv --import "$DIR/keys.gpg"
-		fi
-		if test -f "$DIR/sources_local.list"; then
-			sudo cp /etc/apt/sources.list /etc/apt/sources.list_ORIGINAL
-			sudo cp "$DIR/sources_local.list" /etc/apt/sources.list
-		else
-			echo "Pas de fichier sources_local.list"
-		fi
+		export http_proxy=http://$PROXY_ADDR:$PROXY_PORT
 	elif [ "$1" = "down" ]; then
-		if test -f "$DIR/sources_out.list"; then
-			sudo cp "$DIR/sources_out.list" /etc/apt/sources.list
-		else
-			echo "Pas de fichier /etc/apt/sources_out.list"
-		fi
-	elif [ "$1" = "original" ]; then
-		if test -f "/etc/apt/sources.list_ORIGINAL"; then
-			sudo cp /etc/apt/sources.list_ORIGINAL /etc/apt/sources.list
-		else
-			echo "Pas de fichier /etc/apt/sources.list_ORIGINAL"
-		fi
+		unset http_proxy
 	fi
 }
 
@@ -281,7 +258,7 @@ WORD56="Ajouter des couleurs pour les info du terminal (PS)"
 WORD57=">> Reset: \"$WORD56\""
 
 # For additionnal PPA, do not enable it if repo is used (already in sources.list)
-test "$MIRROR_GOOD_DISTRIB" = "TRUE" && PPAS=FALSE || PPAS=TRUE
+test "$GOOD_DISTRIB" = "TRUE" && PPAS=FALSE || PPAS=TRUE
 
 #gui 1
 choicess=`/usr/bin/zenity --title="$WORD8" --width=600 --height=600 \
@@ -297,7 +274,7 @@ choicess=`/usr/bin/zenity --title="$WORD8" --width=600 --height=600 \
 				FALSE "$WORD26" \
 				FALSE "$WORD27" \
 				$PPAS "$WORD34" \
-				$MIRROR_GOOD_DISTRIB "$WORD39" \
+				$USE_PROXY "$WORD39" \
 				FALSE "$WORD40" \
 				TRUE "$WORD41" \
 				FALSE "$WORD42" \
@@ -365,13 +342,13 @@ then
 			testConnection
 			addallkey
 			sudo apt-get update
-		elif [ "$choicee" = "$WORD39" ]; # mirror
+		elif [ "$choicee" = "$WORD39" ]; # proxy
 			then
-			echo "Check mirror (again)"
-			wget -q --no-check-certificate --timeout=5 --tries=2 $MIRROR_ADDR -O /dev/null > /dev/null 2>&1 && echo "Add mirror" || continue ## recheck if the mirror is available
-			OurMirror "up"
+			echo "Check proxy (again)"
+			wget -q --no-check-certificate --timeout=5 --tries=2 $PROXY_ADDR:$PROXY_PORT -O /dev/null > /dev/null 2>&1 && echo "Add proxy" || continue ## recheck if the proxy is available
+			OurProxy "up"
 			apt-get update
-			MIRROR="yes"
+			PROXY="yes"
 		elif [ "$choicee" = "$WORD40" ]; # extra games
 			then
 			sudo -u $ON_USER mkdir /home/$ON_USER/Jeux
@@ -529,9 +506,7 @@ then
 	do
 		if [ "$choice" = "Cairo-Dock" ];
 			then
-				if [ "$MIRROR" != "yes" ]; then
-					AddMeApt "deb http://ppa.launchpad.net/cairo-dock-team/ppa/ubuntu $DISTRIB main ## Cairo-Dock-PPA"
-				fi
+				AddMeApt "deb http://ppa.launchpad.net/cairo-dock-team/ppa/ubuntu $DISTRIB main ## Cairo-Dock-PPA"
 				packagesInst="$packagesInst cairo-dock cairo-dock-plug-ins "
 		elif [ "$choice" = "Cairo-Dock Weekly" ];
 			then
@@ -583,9 +558,7 @@ then
 				packagesInst="$packagesInst ubuntu-restricted-addons ubuntu-restricted-extras libdvdnav4 libdvdread4 libdvdcss2 rar unrar p7zip-full p7zip-rar unace ttf-mscorefonts-installer ttf-liberation mencoder adobe-flashplugin "
 		elif [ "$choice" = "Ubuntu-Tweak" ];
 			then
-				if [ "$MIRROR" != "yes" ]; then
-					AddMeApt "deb http://ppa.launchpad.net/tualatrix/ppa/ubuntu $DISTRIB main ## Ubuntu-Tweak Next"
-				fi
+				AddMeApt "deb http://ppa.launchpad.net/tualatrix/ppa/ubuntu $DISTRIB main ## Ubuntu-Tweak Next"
 				packagesInst="$packagesInst ubuntu-tweak "
 		elif [ "$choice" = "CCSM et extra plugins" ];
 			then
@@ -726,8 +699,12 @@ then
 	sudo apt-get clean || (bPostInstFailed=1 && echo -e "\n\n\t=== ERROR clean ===\n\n")
 	sudo apt-get autoclean || (bPostInstFailed=1 && echo -e "\n\n\t=== ERROR autoclean ===\n\n")
 	sudo apt-get autoremove -y || (bPostInstFailed=1 && echo -e "\n\n\t=== ERROR autoremove ===\n\n")
-	if [ "$MIRROR" = "yes" ]; then
-		OurMirror "down"
+	
+	# This is not really needed anymore, as the proxy usage is signified
+	# to apt with an env variable, but we keep it as it can change in the
+	# future
+	if [ "$PROXY" = "yes" ]; then
+		OurProxy "down"
 		echo "Utilisation des serveurs externes"
 		sudo apt-get update
 	fi
