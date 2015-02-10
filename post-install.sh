@@ -219,9 +219,9 @@ function AddMeApt ()
 function OurProxy ()
 {
 	if [ "$1" = "up" ]; then
-		export http_proxy=http://$PROXY_ADDR:$PROXY_PORT
+		echo "Acquire::http::Proxy \"http://$PROXY_ADDR:$PROXY_PORT\";" > /etc/apt/apt.conf.d/llnux_proxy
 	elif [ "$1" = "down" ]; then
-		unset http_proxy
+		rm -f /etc/apt/apt.conf.d/llnux_proxy
 	fi
 }
 
@@ -700,9 +700,6 @@ then
 	sudo apt-get autoclean || (bPostInstFailed=1 && echo -e "\n\n\t=== ERROR autoclean ===\n\n")
 	sudo apt-get autoremove -y || (bPostInstFailed=1 && echo -e "\n\n\t=== ERROR autoremove ===\n\n")
 	
-	# This is not really needed anymore, as the proxy usage is signified
-	# to apt with an env variable, but we keep it as it can change in the
-	# future
 	if [ "$PROXY" = "yes" ]; then
 		OurProxy "down"
 		echo "Utilisation des serveurs externes"
