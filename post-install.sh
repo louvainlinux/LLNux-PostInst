@@ -1,6 +1,6 @@
 #!/bin/bash
 # Script which should help users install / tweak some stuff immediately
-# after installing Ubuntu 14.04 32bit and 64bit.
+# after installing Ubuntu (and derivatives) 14.04 32bit and 64bit.
 #
 # The script comes with no warranty. The author is not responsible if
 # your system breaks.
@@ -9,6 +9,7 @@
 #
 #  Copyright (C) 2010 Alin Andrei, http://www.webupd8.org
 #  Copyright 2011-2014 Matthieu Baerts <matttbe@gmail.com>
+#  Copyright 2011-2015 Louvain-li-Nux and its members
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -237,7 +238,7 @@ WORD20="Activer les icônes dans les menus et les boutons"
 WORD21=">> Reset: \"$WORD20\""
 WORD26="Enlever le paquet ubuntu-docs (libération de 252Mo)"
 WORD27=">> Reset \"$WORD26\""
-WORD34="Ajouter des dépôts additionnels (PPA de Cairo-Dock, Matttbe, LaTeXila et Ubuntu-Tweak) SI VOUS N'UTILISEZ PAS NOTRE MIRROIR"
+WORD34="Ajouter des dépôts additionnels (PPA de Cairo-Dock, LaTeXila et Ubuntu-Tweak) SI VOUS N'UTILISEZ PAS NOTRE MIRROIR"
 WORD39="Ajouter notre miroir (32 and 64bits only)"
 WORD40="Télécharger un centre de logiciels dédié aux jeux"
 WORD41="Défilement des messages du terminal sans limite"
@@ -332,7 +333,7 @@ then
 			sudo rm /etc/apt/sources.list_backup > /dev/null 2>&1;
 			sudo cp /etc/apt/sources.list /etc/apt/sources.list_backup
 
-			ARRAY=( "deb http://archive.canonical.com/ubuntu $DISTRIB partner ## Canonical" "deb http://ppa.launchpad.net/cairo-dock-team/ppa/ubuntu $DISTRIB main ## Cairo-Dock-PPA" "deb http://ppa.launchpad.net/matttbe/ppa/ubuntu $DISTRIB main ## Matttbe" "deb http://download.videolan.org/pub/debian/stable / ## dvdcss")
+			ARRAY=( "deb http://archive.canonical.com/ubuntu $DISTRIB partner ## Canonical" "deb http://ppa.launchpad.net/cairo-dock-team/ppa/ubuntu $DISTRIB main ## Cairo-Dock-PPA" "deb http://download.videolan.org/pub/debian/stable / ## dvdcss")
 
 			ELEMENTS=${#ARRAY[@]}
 			for (( i=0;i<$ELEMENTS;i++));
@@ -393,11 +394,11 @@ then
 		elif [ "$choicee" = "$WORD50" ];
 			then
 			sudo mkdir -p /etc/lightdm/lightdm.conf.d
-			echo "[SeatDefaults]" > /etc/lightdm/lightdm.conf.d/50-matttbe-disable-guest.conf
-			echo "allow-guest=false" >> /etc/lightdm/lightdm.conf.d/50-matttbe-disable-guest.conf
+			echo "[SeatDefaults]" > /etc/lightdm/lightdm.conf.d/50-llnux-disable-guest.conf
+			echo "allow-guest=false" >> /etc/lightdm/lightdm.conf.d/50-llnux-disable-guest.conf
 		elif [ "$choicee" = "$WORD51" ];
 			then
-			rm -f /etc/lightdm/lightdm.conf.d/50-matttbe-disable-guest.conf
+			rm -f /etc/lightdm/lightdm.conf.d/50-llnux-disable-guest.conf
 		elif [ "$choicee" = "$WORD52" ];
 			then
 			echo 'gsettings set org.gnome.nautilus.preferences executable-text-activation ask' >> "$CMD_FOR_USER"
@@ -455,7 +456,6 @@ choices=`/usr/bin/zenity --title="Etape 2: installation des paquets" --width=800
 	FALSE "Atom" "Éditeur de texte du style de Sublime Text mais libre, plus personnalisable et édité par Github" \
 	FALSE "Blender" "Logiciel complet et puissant de création de vidéos animée" \
 	FALSE "Cairo-Dock" "Un environnement et une barre des tâches (dock) sympa et pratique" \
-	FALSE "Cairo-Dock Weekly" "Un environnement et une barre des tâches sympa et pratique (Weekly version)" \
 	TRUE "CCSM et extra plugins" "CompizConfig Settings Manager et extra plugins" \
 	FALSE "Chromium Browser" "Navigateur open source avec Pepper (flash)" \
 	TRUE "Codecs et extras" "Codecs (multimedia, java, flash), support d'archives supplémentaires, support DVD et fonts" \
@@ -464,12 +464,10 @@ choices=`/usr/bin/zenity --title="Etape 2: installation des paquets" --width=800
 	FALSE "EasyTag" "Éditeur performant de tags pour les fichiers audio" \
 	FALSE "Evolution" "Client E-mail" \
 	FALSE "Eclipse" "Un IDE, principalement pour Java" \
-	FALSE "Environnement de bureau Gnome" "Gnome-Shell et le Gnome-Panel" \
 	FALSE "FileZilla" "Client FTP réputé" \
 	TRUE "Gimp" "Editeur complet d'images bitmap" \
 	FALSE "Gobby" "Editeur de texte collaboratif (édition à plusieurs en même temps)" \
 	FALSE "Google Earth" "Google Earth vous permet de voyager partout sur Terre" \
-	FALSE "Google Talk plugin" "Plugin Google Talk pour le navigateur (audio et vidéo chat dans GMail et Google Plus)" \
 	FALSE "GThumb" "Visionneur d'image rapide avec plusieurs options intéressantes" \
 	FALSE "Hugin" "Créateur de panorama à partir de plusieurs photos" \
 	TRUE "Inkscape" "Editeur d'images vectorielles" \
@@ -508,10 +506,6 @@ then
 			then
 				AddMeApt "deb http://ppa.launchpad.net/cairo-dock-team/ppa/ubuntu $DISTRIB main ## Cairo-Dock-PPA"
 				packagesInst="$packagesInst cairo-dock cairo-dock-plug-ins "
-		elif [ "$choice" = "Cairo-Dock Weekly" ];
-			then
-				AddMeApt "deb http://ppa.launchpad.net/cairo-dock-team/weekly/ubuntu $DISTRIB main ## Cairo-Dock-PPA-Weekly"
-				packagesInst="$packagesInst cairo-dock cairo-dock-plug-ins "
 		elif [ "$choice" = "Chromium Browser" ];
 			then
 				packagesInst="$packagesInst chromium-browser chromium-browser-l10n pepperflashplugin-nonfree "
@@ -524,16 +518,6 @@ then
 				sudo echo googleearth shared/accepted-googleearth-eula select true | sudo /usr/bin/debconf-set-selections
 				AddMeApt "deb http://dl.google.com/linux/earth/deb/ stable main ## Google Repo"
 				packagesInst="$packagesInst googleearth googleearth-data "
-		elif [ "$choice" = "Google Talk plugin" ];
-			then
-				GT_LIST="/etc/apt/sources.list.d/google-talkplugin.list"
-				sudo rm -f $GT_LIST
-				sudo touch $GT_LIST
-				echo "### THIS FILE IS AUTOMATICALLY CONFIGURED ###" | sudo tee -a $GT_LIST > /dev/null
-				echo "# You may comment out this entry, but any other modifications may be lost." | sudo tee -a $GT_LIST > /dev/null
-				echo "deb http://dl.google.com/linux/talkplugin/deb/ stable main" | sudo tee -a $GT_LIST > /dev/null
-				packagesInst="$packagesInst google-talkplugin "
-				# Or download and install: https://dl.google.com/linux/direct/google-talkplugin_current_i386.deb or https://dl.google.com/linux/direct/google-talkplugin_current_amd64.deb
 		elif [ "$choice" = "Outils de développement" ];
 			then
 				packagesInst="$packagesInst build-essential automake make patch dpatch patchutils autotools-dev cmake libtool autoconf git gitg meld subversion bzr mercurial geany geany-plugins colordiff vim zsh gdb valgrind nemiver d-feet devhelp "
@@ -578,11 +562,6 @@ then
 		elif [ "$choice" = "ZRam" ];
 			then
 				packagesInst="$packagesInst zram-config "
-		elif [ "$choice" = "Environnement de bureau Gnome" ];
-			then
-				packagesInst="$packagesInst gnome-panel gnome-shell gnome-tweak-tool "
-				custom_gnome_shell
-				# apt-cache search gnome-shell-extension | awk '{ print $1 }' | xargs
 		elif [ "$choice" = "nVidia Prime" ];
 			then
 				packagesInst="$packagesInst nvidia-prime "
@@ -624,7 +603,7 @@ then
 	# Script vérification
 	echo -e "\n\t ====== Packages verification and installation! =======\n"
 
-	mkdir -p "$DIR/matttbe"
+	mkdir -p "$DIR/llnux"
 	echo -e '# on ajoute que les paquets qui manquent
 	echo "\t on ajoute que les paquets qui manquent"
 	unset $paquetsPresent
@@ -650,12 +629,12 @@ then
 	done
 	## Une fois la liste vérifiée, on écrase le fichier avec la commande minimale pour la suite
 	echo "sudo apt-get install -y --force-yes -m $paquetsOK || exit 1
-	# Paquets mauvais: $paquetsNOTok" > "'$DIR'/matttbe/install_packages.sh"
-	#sudo apt-get install -y --force-yes -m $paquetsOK' > "$DIR/matttbe/check_packages.sh"
-	chmod +x "$DIR/matttbe/check_packages.sh"
-	sudo sh "$DIR/matttbe/check_packages.sh" # check packages
-	chmod +x "$DIR/matttbe/install_packages.sh"
-	sudo sh "$DIR/matttbe/install_packages.sh" || (bPostInstFailed=1 && echo -e "\n\n\t=== ERROR INSTALL ===\n\n")
+	# Paquets mauvais: $paquetsNOTok" > "'$DIR'/llnux/install_packages.sh"
+	#sudo apt-get install -y --force-yes -m $paquetsOK' > "$DIR/llnux/check_packages.sh"
+	chmod +x "$DIR/llnux/check_packages.sh"
+	sudo sh "$DIR/llnux/check_packages.sh" # check packages
+	chmod +x "$DIR/llnux/install_packages.sh"
+	sudo sh "$DIR/llnux/install_packages.sh" || (bPostInstFailed=1 && echo -e "\n\n\t=== ERROR INSTALL ===\n\n")
 
 
 	sudo apt-get install -f -y || (bPostInstFailed=1 && echo -e "\n\n\t=== ERROR: install empty ===\n\n")
