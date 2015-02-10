@@ -238,8 +238,8 @@ WORD20="Activer les icônes dans les menus et les boutons"
 WORD21=">> Reset: \"$WORD20\""
 WORD26="Enlever le paquet ubuntu-docs (libération de 252Mo)"
 WORD27=">> Reset \"$WORD26\""
-WORD34="Ajouter des dépôts additionnels (PPA de Cairo-Dock, LaTeXila et Ubuntu-Tweak) SI VOUS N'UTILISEZ PAS NOTRE MIRROIR"
-WORD39="Ajouter notre miroir (32 and 64bits only)"
+WORD34="Ajouter des dépôts additionnels (PPA de Cairo-Dock, LaTeXila et Ubuntu-Tweak)"
+WORD39="Ajouter notre proxy (seulement lors de l'install party)"
 WORD40="Télécharger un centre de logiciels dédié aux jeux"
 WORD41="Défilement des messages du terminal sans limite"
 WORD42=">> Reset: \"$WORD41\""
@@ -281,7 +281,7 @@ choicess=`/usr/bin/zenity --title="$WORD8" --width=600 --height=600 \
 				FALSE "$WORD42" \
 				TRUE "$WORD44" \
 				FALSE "$WORD45" \
-				TRUE "$WORD46" \
+				FALSE "$WORD46" \
 				FALSE "$WORD47" \
 				TRUE "$WORD48" \
 				TRUE "$WORD49" \
@@ -465,16 +465,16 @@ choices=`/usr/bin/zenity --title="Etape 2: installation des paquets" --width=800
 	FALSE "Evolution" "Client E-mail" \
 	FALSE "Eclipse" "Un IDE, principalement pour Java" \
 	FALSE "FileZilla" "Client FTP réputé" \
-	TRUE "Gimp" "Editeur complet d'images bitmap" \
+	FALSE "Gimp" "Editeur complet d'images bitmap" \
 	FALSE "Gobby" "Editeur de texte collaboratif (édition à plusieurs en même temps)" \
 	FALSE "Google Earth" "Google Earth vous permet de voyager partout sur Terre" \
 	FALSE "GThumb" "Visionneur d'image rapide avec plusieurs options intéressantes" \
 	FALSE "Hugin" "Créateur de panorama à partir de plusieurs photos" \
-	TRUE "Inkscape" "Editeur d'images vectorielles" \
+	FALSE "Inkscape" "Editeur d'images vectorielles" \
 	FALSE "LaTeX" "LaTeX (binaires, modules et éditeur)" \
 	TRUE "Misc" "Quelques utilitaires (convertir du texte, de la musique, renommer plusieurs fichiers, etc.)" \
 	$NVIDIA_PRIME "nVidia Prime" "nVidia Optimus technology (ex Optimus) - Uniquement si nécessaire" \
-	TRUE "OpenShot" "Éditeur de vidéo simple et puissant" \
+	FALSE "OpenShot" "Éditeur de vidéo simple et puissant" \
 	FALSE "Outils de développement" "De build-essential à Subversion, GIT et autres" \
 	FALSE "Outils de packaging Debian-Ubuntu" "Pour la construction de paquets et développement pour Debian et Ubuntu" \
 	FALSE "Pidgin" "Client de messageries instantanées" \
