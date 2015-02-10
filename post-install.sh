@@ -55,6 +55,7 @@ if [ "$UID" -ne "$ROOT_UID" ];
 fi
 
 ON_USER=$(users | awk '{print $1}') # first: the one who has launched X
+export DBUS_SESSION=$(grep -v "^#" /home/$ON_USER/.dbus/session-bus/`cat /var/lib/dbus/machine-id`-0)
 
 #running gconf-tool2/dconf with "sudo" fails to set the options for the current user so this tweak makes it possible to run sudo for gconf-tool2 and change the setting for the current user, not the root user
 # export $(grep -v "^#" /home/$ON_USER/.dbus/session-bus/`cat /var/lib/dbus/machine-id`-0)
@@ -423,20 +424,22 @@ then
 	done
 	# sudo -u $ON_USER "DBUS_SESSION_BUS_ADDRESS="$DBUS_SESSION_BUS_ADDRESS gsettings-data-convert
 	IFS=""
-	if test `wc "$CMD_FOR_USER" | awk '{print $1}'` -gt 2; then ## TODO: remove this workaround if we find something better to really execute gsettings/gconftool with user's DBus session.
+	if test `wc "$CMD_FOR_USER" | awk '{print $1}'` -gt 2; then 
+		sudo -u $ON_USER $DBUS_SESSION $CMD_FOR_USER
+		# TODO: remove this workaround if we find something better to really execute gsettings/gconftool with user's DBus session.
 		# It seems we can't execute these command from the root user (even with sudo -u $ON_USER)
 		# If we set the right DBUS_SESSION_BUS_ADDRESS and we launch it with the right user
 		#  or if we launch all commands with: sudo -u $ON_USER $COLORTERM -x "$CMD_FOR_USER"
 		#  settings are not "saved". We can see the new settings with dconf-editor but they are not used by all applications!
-		rm -f $CMD_FOR_USER.launched
-		echo "date -R > \"$CMD_FOR_USER.launched\"" >> "$CMD_FOR_USER"
-		MSG_FOR_USER="Merci de lancer le script suivant depuis un nouveau terminal de l'utilisateur $ON_USER :\n\t$CMD_FOR_USER"
-		echo -e "\n$MSG_FOR_USER\n"
-		zenity --info --text="$MSG_FOR_USER" --title="Étape manuelle" &
-		ZENITY_PID=$!
-		echo -e "\n\tAttente de l'exécution du script: le script continuera une fois que ce script sera exécuté"
-		while test ! -f $CMD_FOR_USER.launched; do sleep 1; done
-		kill -15 $ZENITY_PID 2> /dev/null
+		#rm -f $CMD_FOR_USER.launched
+		#echo "date -R > \"$CMD_FOR_USER.launched\"" >> "$CMD_FOR_USER"
+		#MSG_FOR_USER="Merci de lancer le script suivant depuis un nouveau terminal de l'utilisateur $ON_USER :\n\t$CMD_FOR_USER"
+		#echo -e "\n$MSG_FOR_USER\n"
+		#zenity --info --text="$MSG_FOR_USER" --title="Étape manuelle" &
+		#ZENITY_PID=$!
+		#echo -e "\n\tAttente de l'exécution du script: le script continuera une fois que ce script sera exécuté"
+		#while test ! -f $CMD_FOR_USER.launched; do sleep 1; done
+		#kill -15 $ZENITY_PID 2> /dev/null
 	fi
 	echo "Fait! L'étape 2 va commencer!"
 else
