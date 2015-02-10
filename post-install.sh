@@ -453,7 +453,7 @@ choices=`/usr/bin/zenity --title="Etape 2: installation des paquets" --width=800
 	FALSE "Steam" "Installer Steam (jeux vidéos propriétaires)" \
 	FALSE "Thèmes supplémentaires" "Installation des thèmes de community" \
 	TRUE "Ubuntu-Tweak" "Outil d'amélioration d'Ubuntu et plein de dépôts additionnels (PPAs) (Attention, beta)" \
-	TRUE "Unity-Tweak-Tool" "Outil simple de personnalisation" \
+	FALSE "Unity-Tweak-Tool" "Outil simple de personnalisation" \
 	TRUE "VLC" "Lecteur de vidéos" \
 	FALSE "Wine" "Lancer des applications Windows sous Linux" \
 	$ZRAM "ZRam" "Utiliser ZRam (compression de la mémoire ram peu utilisée): très conseillé pour les PCs avec 2 voir 4 Go de Ram et moins)"`
