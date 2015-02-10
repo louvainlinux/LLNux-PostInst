@@ -456,7 +456,7 @@ choices=`/usr/bin/zenity --title="Etape 2: installation des paquets" --width=800
 	FALSE "Atom" "Éditeur de texte du style de Sublime Text mais libre, plus personnalisable et édité par Github" \
 	FALSE "Blender" "Logiciel complet et puissant de création de vidéos animée" \
 	FALSE "Cairo-Dock" "Un environnement et une barre des tâches (dock) sympa et pratique" \
-	TRUE "CCSM et extra plugins" "CompizConfig Settings Manager et extra plugins" \
+	FALSE "CCSM et extra plugins" "CompizConfig Settings Manager et extra plugins" \
 	FALSE "Chromium Browser" "Navigateur open source avec Pepper (flash)" \
 	TRUE "Codecs et extras" "Codecs (multimedia, java, flash), support d'archives supplémentaires, support DVD et fonts" \
 	FALSE "Dropbox" "Application qui synchronise un dossier avec des serveurs sur le cloud (Gratuit, 2Go)" \
