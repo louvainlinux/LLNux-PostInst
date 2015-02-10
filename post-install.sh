@@ -481,7 +481,6 @@ choices=`/usr/bin/zenity --title="Etape 2: installation des paquets" --width=800
 	FALSE "Pipelight" "Installe et active les plugins propriétaires Silverlight, Unity3D et Widevine pour Firefox" \
 	FALSE "Skype" "Application VoIP chat" \
 	FALSE "Steam" "Installer Steam (jeux vidéos propriétaires)" \
-	TRUE "Synapse" "Recherche rapide d'un peu de tout" \
 	FALSE "Thèmes supplémentaires" "Installation des thèmes de community" \
 	TRUE "Ubuntu-Tweak" "Outil d'amélioration d'Ubuntu et plein de dépôts additionnels (PPAs) (Attention, beta)" \
 	TRUE "Unity-Tweak-Tool" "Outil simple de personnalisation" \
