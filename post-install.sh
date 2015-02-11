@@ -30,7 +30,7 @@
 #Credits:
 #based on the idea of: http://czytelnia.ubuntu.pl/index.php/2009/11/03/skrypt-ulatwiajacy-konfiguracje-ubuntu-9-10-karmic-koala/, but Ubuntu Start is a completely re-written script with lots of new features.
 
-
+WEBPAGE_END="https://docs.google.com/forms/d/1N-zskZ8ZmojRuGmQK6bO2UupImWLgiOiXqgD-BlRpX8/viewform"
 PROXY_ADDR="http://192.170.1.1/"
 PROXY_PORT="3142"
 # Download manual ## TODO: download from the local mirror
